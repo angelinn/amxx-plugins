@@ -1,6 +1,6 @@
 
 #define PLUGIN_NAME "de_rats Weapon Remover"
-#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_VERSION "1.0.1"
 #define AUTHOR_NAME "thurinven"
 
 #define TARGET_MAP "de_rats_1337"
@@ -9,6 +9,7 @@
 
 #include <amxmodx>
 #include <engine>
+#include <cstrike>
 
 public plugin_init()
 {
@@ -18,20 +19,23 @@ public plugin_init()
 
 public plugin_cfg()
 {    
-    new mapName[64]
-    get_mapname(mapName, sizeof(mapName))
+    new map_name[64]
+    get_map_name(map_name, sizeof(map_name))
 
-    if (equali(mapName, TARGET_MAP))
+    if (equali(map_name, TARGET_MAP))
     {
-        server_print("[%s] Current map is %s, trying to remove awp...", PLUGIN_TAG, mapName)
+        server_print("[%s] Current map is %s, trying to remove awp...", PLUGIN_TAG, map_name)
 
-        new awp_entity_id = find_ent_by_class(-1, TARGET_ENTITY)
-        if (awp_entity_id)
+        new entity_id = find_ent_by_class(-1, TARGET_ENTITY)
+        if (entity_id)
         {
-            if (remove_entity(awp_entity_id))
-                server_print("[%s] Removed armoury_entity with index: %i", PLUGIN_TAG, awp_entity_id)
+            new type = cs_get_armoury_type(entity_id)
+            if (type == CSW_AWP && remove_entity(entity_id))
+                server_print("[%s] Removed armoury_entity with index: %i", PLUGIN_TAG, entity_id)
             else
-                server_print("[%s] Could not remove armoury_entity with index: %i", PLUGIN_TAG, awp_entity_id)
+                server_print("[%s] Entity not CSW_AWP or can't remove", PLUGIN_TAG, entity_id)
         }
+
+        server_print("[%s] Could not find awp entity", PLUGIN_TAG, entity_id)
     }
 }
