@@ -20,7 +20,7 @@ public plugin_init()
 public plugin_cfg()
 {    
     new map_name[64]
-    get_map_name(map_name, sizeof(map_name))
+    get_mapname(map_name, sizeof(map_name))
 
     if (equali(map_name, TARGET_MAP))
     {
@@ -30,7 +30,7 @@ public plugin_cfg()
         if (entity_id)
         {
             new type = cs_get_armoury_type(entity_id)
-            
+
             if (type == CSW_AWP && remove_entity(entity_id))
                 server_print("[%s] Removed CSW_AWP with index: %i", PLUGIN_TAG, entity_id)
             else
