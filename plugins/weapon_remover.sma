@@ -30,12 +30,13 @@ public plugin_cfg()
         if (entity_id)
         {
             new type = cs_get_armoury_type(entity_id)
+            
             if (type == CSW_AWP && remove_entity(entity_id))
-                server_print("[%s] Removed armoury_entity with index: %i", PLUGIN_TAG, entity_id)
+                server_print("[%s] Removed CSW_AWP with index: %i", PLUGIN_TAG, entity_id)
             else
                 server_print("[%s] Entity not CSW_AWP or can't remove", PLUGIN_TAG, entity_id)
         }
-
-        server_print("[%s] Could not find awp entity", PLUGIN_TAG, entity_id)
+        else
+            server_print("[%s] Could not find awp entity", PLUGIN_TAG, entity_id)
     }
 }
