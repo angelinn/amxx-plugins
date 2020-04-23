@@ -16,6 +16,7 @@ new const m_rgpPlayerItems_CBasePlayer[6] = {367,368,...}
 const m_pActiveItem = 373
 
 new bool: isHappyHourStarted
+new bool: hasBombSite
 
 public plugin_init()
 {
@@ -25,6 +26,8 @@ public plugin_init()
     cvar_timeend = register_cvar("happyhour_end", "23")
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", true)
+    if (cs_find_ent_by_class(-1, "func_bomb_target") > 0 || cs_find_ent_by_class(-1, "info_bomb_target") > 0)
+        hasBombSite = true
 }
 
 public OnPlayerSpawn(id)
@@ -84,6 +87,11 @@ public OnPlayerSpawn(id)
         }
         
         cs_set_user_bpammo(id, CSW_DEAGLE, 35)
+
+        if (hasBombSite && cs_get_user_team(id) == CS_TEAM_CT)
+        {
+            cs_set_user_defuse(id, 1)
+        }
     }  
 }
 
