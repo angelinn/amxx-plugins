@@ -3,7 +3,6 @@
 #include <hamsandwich>
 #include <cstrike>
 #include <fakemeta>
-#include <reapi>
 #include <WPMGPrintChatColor>
 
 new cvar_timestart
@@ -17,11 +16,10 @@ new hudObject
 
 new const m_rgpPlayerItems_CBasePlayer[6] = {367,368,...}
 const m_pActiveItem = 373
+const showMessageTaskID = 1234
 
 new bool: isHappyHourStarted
 new bool: hasBombSite
-
-new message[128]
 
 public plugin_init()
 {
@@ -31,8 +29,6 @@ public plugin_init()
     cvar_timeend = register_cvar("happyhour_end", "23")
 
     hudObject = CreateHudSyncObj()
-            
-    //set_task(1.0, "ShowMessage", _, _, _, "b")
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", true)
     if (cs_find_ent_by_class(-1, "func_bomb_target") > 0 || cs_find_ent_by_class(-1, "info_bomb_target") > 0)
@@ -48,14 +44,16 @@ public OnPlayerSpawn(id)
             server_print("HappyHour - Starting happy hour from %d to %d", happyhourStart, happyhourEnd)
             
             isHappyHourStarted = true
-            formatex(message, 127, "Happy Hour: %d:00 do %d:00 ( ON )", happyhourStart, happyhourEnd)
-
-            set_task(1.0, "ShowMessage", _, _, _, "b")
+            
+            set_task(1.0, "ShowMessage", showMessageTaskID, _, _, "b")
             PrintChatColor(0, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy Hour !g%i:00 do !g%i:00 !tzapochna !!! Zabavlqvaite se ^1!", happyhourStart, happyhourEnd)
         }
     }
     else
     {
+        if (isHappyHourStarted)
+            remove_task(showMessageTaskID)
+            
         isHappyHourStarted = false
     }
     
@@ -76,6 +74,7 @@ public OnPlayerSpawn(id)
         }
 
         new gun = get_pdata_cbase(id, m_rgpPlayerItems_CBasePlayer[2]);
+        
         if (gun > 0)
         {
             new iId = cs_get_weapon_id(gun);
@@ -101,9 +100,8 @@ public OnPlayerSpawn(id)
 
 public ShowMessage()
 {
-    set_hudmessage(255, 255, 255, 0.02, 0.18, 1, 2.0, 1.0, 0.5, 1.0, -1)
-    server_print("show message / handle %d", hudObject)
-    ShowSyncHudMsg(0, hudObject, "TEST MESSAGE %d", 1)
+    set_hudmessage(255, 255, 255, 0.01, 0.21, 1, 2.0, 1.0, 0.5, 1.0, -1)
+    ShowSyncHudMsg(0, hudObject, "Happy Hour: %d:00 do %d:00 ( ON )", happyhourStart, happyhourEnd)
 }
 
 IsHappyHour()
@@ -121,12 +119,15 @@ IsHappyHour()
 
 }
 
+
 ham_strip_user_weaponent(id, weaponEnt, iId=0, bool:bSwitchIfActive = true)
 {
-    if (bSwitchIfActive && get_pdata_cbase(id, m_pActiveItem) == weaponEnt)
-    {
-        ExecuteHamB(Ham_Weapon_RetireWeapon, weaponEnt);
-    }
+    // new d = get_pdata_cbase(id, m_pActiveItem)
+
+    // if (bSwitchIfActive && d == weaponEnt)
+    // {
+    //     ExecuteHamB(Ham_Weapon_RetireWeapon, weaponEnt);
+    // }
 
     if (ExecuteHamB(Ham_RemovePlayerItem, id, weaponEnt))
     {
