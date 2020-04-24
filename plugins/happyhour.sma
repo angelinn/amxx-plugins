@@ -3,6 +3,7 @@
 #include <hamsandwich>
 #include <cstrike>
 #include <fakemeta>
+#include <reapi>
 #include <WPMGPrintChatColor>
 
 new cvar_timestart
@@ -12,11 +13,15 @@ new happyhourEnd
 new hourStr[3]
 new currentHour
 
+new hudObject
+
 new const m_rgpPlayerItems_CBasePlayer[6] = {367,368,...}
 const m_pActiveItem = 373
 
 new bool: isHappyHourStarted
 new bool: hasBombSite
+
+new message[128]
 
 public plugin_init()
 {
@@ -24,6 +29,10 @@ public plugin_init()
     
     cvar_timestart = register_cvar("happyhour_start", "18")
     cvar_timeend = register_cvar("happyhour_end", "23")
+
+    hudObject = CreateHudSyncObj()
+            
+    //set_task(1.0, "ShowMessage", _, _, _, "b")
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", true)
     if (cs_find_ent_by_class(-1, "func_bomb_target") > 0 || cs_find_ent_by_class(-1, "info_bomb_target") > 0)
@@ -39,24 +48,19 @@ public OnPlayerSpawn(id)
             server_print("HappyHour - Starting happy hour from %d to %d", happyhourStart, happyhourEnd)
             
             isHappyHourStarted = true
+            formatex(message, 127, "Happy Hour: %d:00 do %d:00 ( ON )", happyhourStart, happyhourEnd)
+
+            set_task(1.0, "ShowMessage", _, _, _, "b")
             PrintChatColor(0, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy Hour !g%i:00 do !g%i:00 !tzapochna !!! Zabavlqvaite se ^1!", happyhourStart, happyhourEnd)
         }
     }
     else
     {
-        if (isHappyHourStarted)
-        {     
-            remove_task(id)
-        }
-
         isHappyHourStarted = false
     }
     
     if (isHappyHourStarted && is_user_connected(id) && is_user_alive(id))
     {
-        if (!task_exists(id))
-            set_task(1.0, "ShowMessage", id, _, _, "b")
-
         PrintChatColor(id, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy hour e aktiven! Poluchavate bonus !gdeagle !ti !ggranati!")
 
         new weapons = pev(id, pev_weapons);
@@ -98,12 +102,8 @@ public OnPlayerSpawn(id)
 public ShowMessage()
 {
     set_hudmessage(255, 255, 255, 0.02, 0.18, 1, 2.0, 1.0, 0.5, 1.0, -1)
-    show_hudmessage(0, "Happy Hour: %i:00 do %i:00 ( ON )^n", happyhourStart, happyhourEnd)
-}
-
-public client_disconnected(id)
-{
-    remove_task(id)
+    server_print("show message / handle %d", hudObject)
+    ShowSyncHudMsg(0, hudObject, "TEST MESSAGE %d", 1)
 }
 
 IsHappyHour()
