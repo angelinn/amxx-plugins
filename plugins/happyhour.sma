@@ -114,7 +114,7 @@ IsHappyHour()
     currentHour = str_to_num(hourStr)
     
     return (happyhourStart < happyhourEnd ? 
-                (happyhourStart <= currentHour && currentHour <= happyhourEnd) : 
+                (happyhourStart <= currentHour && currentHour < happyhourEnd) : 
                 (happyhourStart <= currentHour || currentHour <= happyhourEnd))
 
 }
