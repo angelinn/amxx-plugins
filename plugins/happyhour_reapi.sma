@@ -18,7 +18,7 @@ new bool: hasBombSite
 
 public plugin_init()
 {
-    register_plugin("Happy Hour ReAPI", "1.1", "thurinven")
+    register_plugin("Happy Hour ReAPI", "1.5", "thurinven")
     
     cvar_timestart = register_cvar("happyhour_start", "18")
     cvar_timeend = register_cvar("happyhour_end", "23")
@@ -43,30 +43,28 @@ public OnPlayerSpawn(id)
             set_task(1.0, "ShowMessage", showMessageTaskID, _, _, "b")
             PrintChatColor(0, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy Hour !g%i:00 do !g%i:00 !tzapochna !!! Zabavlqvaite se ^1!", happyhourStart, happyhourEnd)
         }
+
+        if (is_user_alive(id))
+        {
+            PrintChatColor(id, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy hour e aktiven! Poluchavate bonus !gdeagle !ti !ggranati!")
+
+            rg_give_item(id, "weapon_flashbang", GT_REPLACE)
+            rg_set_user_bpammo(id, CSW_FLASHBANG, 2)
+            rg_give_item(id, "weapon_hegrenade")
+            rg_give_item(id, "weapon_deagle", GT_REPLACE)        
+            rg_set_user_bpammo(id, CSW_DEAGLE, 35)
+
+            if (hasBombSite && get_member(id, m_iTeam) == TEAM_CT)
+            {
+                rg_give_defusekit(id)
+            }
+        }
     }
-    else
+    else if (isHappyHourStarted)
     {
-        if (isHappyHourStarted)
-            remove_task(showMessageTaskID)
-            
+        remove_task(showMessageTaskID)
         isHappyHourStarted = false
-    }
-    
-    if (isHappyHourStarted && is_user_connected(id) && is_user_alive(id))
-    {
-        PrintChatColor(id, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy hour e aktiven! Poluchavate bonus !gdeagle !ti !ggranati!")
-
-        rg_give_item(id, "weapon_flashbang", GT_REPLACE)
-        rg_set_user_bpammo(id, CSW_FLASHBANG, 2)
-        rg_give_item(id, "weapon_hegrenade")
-        rg_give_item(id, "weapon_deagle", GT_REPLACE)        
-        rg_set_user_bpammo(id, CSW_DEAGLE, 35)
-
-        if (hasBombSite && get_member(id, m_iTeam) == TEAM_CT)
-		{
-			rg_give_defusekit(id)
-		}
-    }     
+    }    
 }
 
 public ShowMessage()
