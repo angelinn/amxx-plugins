@@ -1015,8 +1015,8 @@ public QuakeSoundsInfo ( Player )
 {
 	// ONLY IF CONNECTED
 	//
-	if ( g_bConnected [ Player ] )
-		client_print ( Player, print_chat, ">> TYPE 'sounds' TO TURN QUAKE SOUNDS ON OR OFF." );
+	// if ( g_bConnected [ Player ] )
+		// client_print ( Player, print_chat, ">> TYPE 'sounds' TO TURN QUAKE SOUNDS ON OR OFF." );
 }
 
 // EXECUTED ON PLAYER DEATH
