@@ -2,26 +2,44 @@
 #include <reapi>
 #include <WPMGPrintChatColor>
 
-new cvar_timestart
-new cvar_timeend
+#define VIP_FLAG ADMIN_LEVEL_A
+#define SHOW_MESSAGE_TASK_ID 1234
+
+#define REWARD_HE 1 
+#define REWARD_FB 2
+#define REWARD_DEAGLE 4
+#define REWARD_ARMOR 8
+
+new cvarTimeStart
+new cvarTimeEnd
+new cvarRewards
+new cvarVip
+
 new happyhourStart
 new happyhourEnd
+
 new hourStr[3]
 new currentHour
 
 new hudObject
 
-const showMessageTaskID = 1234
-
 new bool: isHappyHourStarted
 new bool: hasBombSite
 
+// happyhour_bonuses
+// 1 - he_grenade
+// 2 - flashbangs
+// 4 - deagle
+// 8 - armor
+
 public plugin_init()
 {
-    register_plugin("Happy Hour ReAPI", "1.5", "thurinven")
+    register_plugin("Happy Hour ReAPI", "1.6", "thurinven")
     
-    cvar_timestart = register_cvar("happyhour_start", "18")
-    cvar_timeend = register_cvar("happyhour_end", "23")
+    cvarTimeStart = register_cvar("happyhour_start", "18")
+    cvarTimeEnd = register_cvar("happyhour_end", "23")
+    cvarRewards = register_cvar("happyhour_rewards", "7")
+    cvarVip = register_cvar("happyhour_include_vip", "1")
 
     hudObject = CreateHudSyncObj()
 
@@ -40,19 +58,37 @@ public OnPlayerSpawn(id)
             
             isHappyHourStarted = true
             
-            set_task(1.0, "ShowMessage", showMessageTaskID, _, _, "b")
+            set_task(1.0, "ShowMessage", SHOW_MESSAGE_TASK_ID, _, _, "b")
             PrintChatColor(0, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy Hour !g%i:00 do !g%i:00 !tzapochna !!! Zabavlqvaite se ^1!", happyhourStart, happyhourEnd)
         }
 
         if (is_user_alive(id))
         {
-            PrintChatColor(id, PRINT_COLOR_PLAYERTEAM,"!g[HappyHour] !tHappy hour e aktiven! Poluchavate bonus !gdeagle !ti !ggranati!")
+            PrintChatColor(id, PRINT_COLOR_PLAYERTEAM,"!g[Kniajevo CS] !t+ happyhour bonuses")
 
-            rg_give_item(id, "weapon_flashbang", GT_REPLACE)
-            rg_set_user_bpammo(id, CSW_FLASHBANG, 2)
-            rg_give_item(id, "weapon_hegrenade")
-            rg_give_item(id, "weapon_deagle", GT_REPLACE)        
-            rg_set_user_bpammo(id, CSW_DEAGLE, 35)
+            if (!get_pcvar_num(cvarVip) && get_user_flags(id) & VIP_FLAG)
+                return
+
+            new rewards = get_pcvar_num(cvarRewards)
+
+            if (rewards & REWARD_DEAGLE)
+            {
+                rg_give_item(id, "weapon_deagle", GT_REPLACE)        
+                rg_set_user_bpammo(id, CSW_DEAGLE, 35)
+            }
+            if (rewards & REWARD_FB)
+            {
+                rg_give_item(id, "weapon_flashbang", GT_REPLACE)
+                rg_set_user_bpammo(id, CSW_FLASHBANG, 2)
+            }
+            if (rewards & REWARD_HE)
+            {
+                rg_give_item(id, "weapon_hegrenade")
+            }
+            if (rewards & REWARD_ARMOR)
+            {
+                rg_set_user_armor(id, 100)
+            }
 
             if (hasBombSite && get_member(id, m_iTeam) == TEAM_CT)
             {
@@ -62,7 +98,7 @@ public OnPlayerSpawn(id)
     }
     else if (isHappyHourStarted)
     {
-        remove_task(showMessageTaskID)
+        remove_task(SHOW_MESSAGE_TASK_ID)
         isHappyHourStarted = false
     }    
 }
@@ -77,8 +113,8 @@ IsHappyHour()
 {
     get_time("%H", hourStr, 2)
     
-    happyhourStart = get_pcvar_num(cvar_timestart)
-    happyhourEnd = get_pcvar_num(cvar_timeend)
+    happyhourStart = get_pcvar_num(cvarTimeStart)
+    happyhourEnd = get_pcvar_num(cvarTimeEnd)
     
     currentHour = str_to_num(hourStr)
     
