@@ -1,7 +1,7 @@
 #include <amxmodx>
 #include <reapi>
 
-#define VIP_FLAGS ADMIN_LEVEL_A
+#define VIP_FLAG ADMIN_LEVEL_A
 
 new playersTurn[33]
 new bool: hasBombSite
@@ -22,7 +22,9 @@ public CBasePlayer_Spawn(id)
         if (playersTurn[id] == 0)
         {
             if (get_user_flags(id) & VIP_FLAG)
-                GiveMoney(id, 1000)
+            {
+                GiveMoney(id, 400)
+            }
             else 
                 GiveGrenades(id)
 
@@ -35,7 +37,7 @@ public CBasePlayer_Spawn(id)
         }
         else if (playersTurn[id] == 2)
         {
-            GiveMoney(id, 1000)
+            GiveMoney(id, 400)
             playersTurn[id] = 0
         }
 

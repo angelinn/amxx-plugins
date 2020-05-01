@@ -87,7 +87,7 @@ public OnPlayerSpawn(id)
             }
             if (rewards & REWARD_ARMOR)
             {
-                rg_set_user_armor(id, 100)
+                rg_set_user_armor(id, 100, ARMOR_VESTHELM)
             }
 
             if (hasBombSite && get_member(id, m_iTeam) == TEAM_CT)
