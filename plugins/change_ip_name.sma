@@ -3,7 +3,7 @@
 #include <cstrike> 
 #include <amxmisc>
 
-#define PATTERN "2701[0-9]"
+#define PATTERN "270[0-9][0-9]"
 
 new changed[32]
 
@@ -59,7 +59,8 @@ public rename_if_ip(pars[], task_id)
     new returnValue, error[64]
     new Regex:handle = regex_match(name, PATTERN, returnValue, error, charsmax(error)) 
 
-    regex_free(handle)
+    if (handle >= 0)
+        regex_free(handle)
 
     if (returnValue == REGEX_OK)
     { 
@@ -73,7 +74,6 @@ public rename_if_ip(pars[], task_id)
         log_amx("%s - %s got name changed.", name, ip)
  
         set_task(10.0, "kick_if_spectator", _, pars, 33 + 1)
-
     } 
     else if (returnValue == REGEX_PATTERN_FAIL || returnValue == REGEX_MATCH_FAIL)
     {
